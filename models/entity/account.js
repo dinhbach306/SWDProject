@@ -18,6 +18,7 @@ const accountSchema = new mongoose.Schema({
   status: {
     type: Number,
     default: 0,
+    required: [true, 'Please provide your status'],
   },
   role: {
     type: String,

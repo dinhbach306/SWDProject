@@ -25,18 +25,24 @@ const orderSchema = new mongoose.Schema({
   },
   total: {
     type: Number,
+    required: [true, 'Please provide your total'],
     default: 0,
   },
   shipFee: {
     type: Number,
+    required: [true, 'Please provide your ship fee'],
     default: 0,
   },
-  // voucher: {
-  //   type: mongoose.Schema.ObjectId,
-  //   ref: 'Voucher',
-  // },
+  voucher: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Voucher',
+  },
   customer: {
     type: mongoose.Schema.ObjectId,
     ref: 'Customer',
   },
 });
+
+const Order = mongoose.model('Order', orderSchema);
+
+module.exports = Order;
