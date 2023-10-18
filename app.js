@@ -6,6 +6,8 @@ const cors = require('cors');
 const globalErrorHandler = require('./controllers/errorController');
 const app = express();
 const uploadRouter = require('./routes/uploadFileRouter');
+const accountRouter = require('./routes/accountRouter');
+const AppError = require('./utils/appError');
 
 // 1) MIDDLEWARES
 if (process.env.NODE_ENV === 'development') {
@@ -34,6 +36,8 @@ app.use((req, res, next) => {
 
 // 2) ROUTES
 app.use('/api/v1/upload', uploadRouter);
+app.use('/api/v1/account', accountRouter);
+
 // 3) CACTH ALL ROUTES IF THE ROUTE IS NOT DEFINED
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

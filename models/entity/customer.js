@@ -1,30 +1,45 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
-const customerSchema = new mongoose.Schema({
-  lastName: {
-    type: String,
-    required: [true, 'Please provide your last name'],
-    maxLength: 50,
-    minLength: 2,
+const customerSchema = new mongoose.Schema(
+  {
+    lastName: {
+      type: String,
+      maxLength: 50,
+      minLength: 2,
+    },
+    firstName: {
+      type: String,
+      maxLength: 50,
+      minLength: 2,
+    },
+    birthDay: {
+      type: String,
+      validate: {
+        validator: function (v) {
+          return validator.isDate(v, ['YYYY/MM/DD']); // YYYY-MM-DD
+        },
+      },
+    },
+    address: {
+      type: String,
+      maxLength: 200,
+    },
+    point: {
+      type: Number,
+      default: 0,
+    },
+    account: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Account',
+      },
+    ],
   },
-  firstName: {
-    type: String,
-    required: [true, 'Please provide your first name'],
-    maxLength: 50,
-    minLength: 2,
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
-  birthDay: {
-    type: String,
-    required: [true, 'Please provide your birthday'],
-  },
-  point: {
-    type: Number,
-    default: 0,
-  },
-  account: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Account',
-  },
-});
+);
 const Customer = mongoose.model('Customer', customerSchema);
 module.exports = Customer;

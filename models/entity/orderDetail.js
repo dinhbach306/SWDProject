@@ -1,38 +1,51 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
-const orderDetailSchema = new mongoose.Schema({
-  price: {
-    type: Number,
-    required: [true, 'Please provide your price'],
+const orderDetailSchema = new mongoose.Schema(
+  {
+    price: {
+      type: Number,
+      required: [true, 'Please provide your price'],
+    },
+    status: {
+      type: Number,
+      default: 1,
+    },
+    content: {
+      type: String,
+      maxLength: 1000,
+    },
+    postDate: {
+      type: String,
+      validate: {
+        validator: function (v) {
+          return validator.isDate(v, ['YYYY/MM/DD']);
+        },
+      },
+    },
+    rating: {
+      type: Number,
+    },
+    quantity: {
+      type: Number,
+      required: [true, 'Please provide your quantity'],
+    },
+    order: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Order',
+    },
+    cage: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Cage',
+      },
+    ],
   },
-  status: {
-    type: Number,
-    default: 0,
-    required: [true, 'Please provide your status'],
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
-  content: {
-    type: String,
-    maxLength: 1000,
-  },
-  postDate: {
-    type: String,
-  },
-  rating: {
-    type: Number,
-  },
-  quantity: {
-    type: Number,
-    required: [true, 'Please provide your quantity'],
-  },
-  order: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Order',
-  },
-  cage: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Cage',
-  },
-});
+);
 
 const OrderDetail = mongoose.model('OrderDetail', orderDetailSchema);
 
