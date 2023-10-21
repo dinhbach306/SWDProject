@@ -31,8 +31,7 @@ const voucherSchema = new mongoose.Schema(
       required: [true, 'Please provide your condition point'],
     },
     status: {
-      type: Number,
-      default: 1,
+      type: String,
     },
   },
   {

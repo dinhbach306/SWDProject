@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const feedbackSchema = new mongoose.Schema(
   {
-    path: String,
+    path: Array,
     orderDetail: [
       {
         type: mongoose.Schema.ObjectId,

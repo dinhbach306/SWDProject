@@ -21,8 +21,7 @@ const accountSchema = new mongoose.Schema(
       select: false,
     },
     status: {
-      type: Number,
-      default: 1,
+      type: String,
     },
     role: {
       type: String,

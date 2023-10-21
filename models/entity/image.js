@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const imageSchema = new mongoose.Schema(
   {
-    imagePath: String,
+    imagePath: Array,
     cage: [
       {
         type: mongoose.Schema.ObjectId,

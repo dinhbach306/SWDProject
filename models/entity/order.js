@@ -4,8 +4,7 @@ const validator = require('validator');
 const orderSchema = new mongoose.Schema(
   {
     status: {
-      type: Number,
-      default: 1,
+      type: String,
     },
     paymentDate: {
       type: String,

@@ -8,8 +8,7 @@ const orderDetailSchema = new mongoose.Schema(
       required: [true, 'Please provide your price'],
     },
     status: {
-      type: Number,
-      default: 1,
+      type: String,
     },
     content: {
       type: String,

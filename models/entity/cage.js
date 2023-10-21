@@ -6,7 +6,7 @@ const cageSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, 'Please provide your name'],
-      maxLength: 50,
+      maxLength: 255,
     },
     length: {
       type: Number,
@@ -26,7 +26,7 @@ const cageSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      maxLength: 255,
+      maxLength: 5000,
     },
     createDate: {
       type: String,
@@ -43,10 +43,15 @@ const cageSchema = new mongoose.Schema(
       required: [true, 'Please provide your price'],
     },
     status: {
-      type: Number,
-      default: 1,
+      type: String,
     },
-    rating: Number,
+    userId: {
+      type: String,
+    },
+    rating: {
+      type: Number,
+      default: 0,
+    },
     imagePath: String,
   },
   {
