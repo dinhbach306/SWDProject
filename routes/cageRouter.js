@@ -6,13 +6,13 @@ const router = express.Router();
 
 router
   .route('/')
-  // .get(userController.getAllCages)
+  .get(cageController.getAllCages)
   .post(cageController.createCage);
 
-// router
-//   .route('/:id')
-//   .get(cageController.getCage)
-//   .patch(cageController.updateCage)
-//   .delete(cageController.deleteCage);
+router
+  .route('/:id')
+  .get(cageController.getCage)
+  .patch(cageController.updateCage)
+  .delete(cageController.deleteCage);
 
 module.exports = router;
