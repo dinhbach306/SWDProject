@@ -45,6 +45,10 @@ const orderSchema = new mongoose.Schema(
       required: [true, 'Please provide your ship fee'],
       default: 0,
     },
+    delFlg: {
+      type: Boolean,
+      default: false,
+    },
     voucher: [
       {
         type: mongoose.Schema.ObjectId,

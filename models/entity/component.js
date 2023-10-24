@@ -13,6 +13,10 @@ const componentSchema = new mongoose.Schema(
       required: [true, 'Please provide your price'],
     },
     imagePath: String,
+    delFlg: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },

@@ -57,6 +57,10 @@ const cageSchema = new mongoose.Schema(
       default: 0,
     },
     imagePath: String,
+    delFlg: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
