@@ -32,7 +32,7 @@ exports.getAllCages = catchAsync(async (req, res, next) => {
 });
 
 exports.getCage = catchAsync(async (req, res, next) => {
-  const cage = Cage.findById(req.params.id);
+  const cage = await Cage.findById(req.params.id);
   checkExistCage(cage);
   res.status(200).json({
     status: 'success',
@@ -57,7 +57,7 @@ exports.updateCage = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteCage = catchAsync(async (req, res, next) => {
-  const cage = Cage.findByIdAndDelete(req.params.id);
+  const cage = await Cage.findByIdAndDelete(req.params.id);
   checkExistCage(cage);
   res.status(204).json({
     status: 'success',
