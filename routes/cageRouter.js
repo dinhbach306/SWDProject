@@ -15,6 +15,13 @@ router
   .patch(cageController.updateCage)
   .delete(cageController.deleteCage);
 
-router.route('/searchName').post(cageController.getCageByName);
+router
+  .route('/searchTopCageCheap')
+  .post(
+    cageController.aliasTopCageCheap,
+    cageController.getTop5CageByNameAndPrice,
+  );
+
+router.route('/searchName').post(cageController.getTop5CageByNameAndPrice);
 
 module.exports = router;

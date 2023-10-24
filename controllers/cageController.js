@@ -58,10 +58,24 @@ exports.deleteCage = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getCageByName = catchAsync(async (req, res, next) => {
+exports.aliasTopCageCheap = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = 'price';
+  next();
+};
+
+exports.getTop5CageByNameAndPrice = catchAsync(async (req, res, next) => {
   // LIKE OPERATOR
-  const cage = await Cage.find({ name: { $regex: req.body.name } });
-  checkExistCage(cage);
+  const features = new APIFeatures(
+    Cage.find({ name: { $regex: req.body.name } }),
+    req.query,
+  )
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+
+  const cage = await features.query;
   res.status(200).json({
     status: 'success',
     data: {
