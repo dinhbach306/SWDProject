@@ -29,6 +29,10 @@ const orderDetailSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'Please provide your quantity'],
     },
+    delFlg: {
+      type: Boolean,
+      default: false,
+    },
     order: {
       type: mongoose.Schema.ObjectId,
       ref: 'Order',

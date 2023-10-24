@@ -31,6 +31,10 @@ const accountSchema = new mongoose.Schema(
       },
       default: 'user',
     },
+    delFlg: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },

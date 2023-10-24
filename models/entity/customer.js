@@ -29,6 +29,10 @@ const customerSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    delFlg: {
+      type: Boolean,
+      default: false,
+    },
     account: [
       {
         type: mongoose.Schema.ObjectId,

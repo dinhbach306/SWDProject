@@ -33,6 +33,10 @@ const voucherSchema = new mongoose.Schema(
     status: {
       type: String,
     },
+    delFlg: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
