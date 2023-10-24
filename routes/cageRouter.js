@@ -15,4 +15,6 @@ router
   .patch(cageController.updateCage)
   .delete(cageController.deleteCage);
 
+router.route('/searchName').post(cageController.getCageByName);
+
 module.exports = router;
