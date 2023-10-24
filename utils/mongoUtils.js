@@ -42,9 +42,9 @@ class mongoUtils {
   }
 
   paginate() {
-    //Example: /api/v1/test?page=2&limit=10
+    //Example: /api/v1/test?page=2&limit=100
     const page = this.queryString.page * 1 || 1; //convert string to number
-    const limit = this.queryString.limit * 1 || 10; //convert string to number
+    const limit = this.queryString.limit * 1 || 100; //convert string to number
     const skip = (page - 1) * limit;
 
     this.query = this.query.skip(skip).limit(limit); //mongoose query

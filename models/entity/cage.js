@@ -44,6 +44,10 @@ const cageSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      enum: {
+        values: ['Available', 'Pending', 'CUS', 'Reject', 'UnAvailable'],
+        message: 'status is either',
+      },
     },
     userId: {
       type: String,

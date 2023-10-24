@@ -5,6 +5,11 @@ const orderSchema = new mongoose.Schema(
   {
     status: {
       type: String,
+      enum: {
+        values: ['Processing', 'Delivering', 'Completed', 'Canceled'],
+        message: 'status is either',
+      },
+      default: 'Processing',
     },
     paymentDate: {
       type: String,
