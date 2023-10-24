@@ -32,7 +32,7 @@ exports.getAllComponents = catchAsync(async (req, res, next) => {
 });
 
 exports.getComponent = catchAsync(async (req, res, next) => {
-  const component = Component.findById(req.params.id);
+  const component = await Component.findById(req.params.id);
   checkExistComponent(component);
   res.status(200).json({
     status: 'success',
@@ -43,7 +43,7 @@ exports.getComponent = catchAsync(async (req, res, next) => {
 });
 
 exports.updateComponent = catchAsync(async (req, res, next) => {
-  const component = Component.findByIdAndUpdate(req.params.id, req.body, {
+  const component = await Component.findByIdAndUpdate(req.params.id, req.body, {
     new: true, //Nếu không có tạo mới
     runValidators: true, //Luôn chạy validator
   });
@@ -57,7 +57,7 @@ exports.updateComponent = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteComponent = catchAsync(async (req, res, next) => {
-  const component = Component.findByIdAndDelete(req.params.id);
+  const component = await Component.findByIdAndDelete(req.params.id);
   checkExistComponent(component);
   res.status(204).json({
     status: 'success',
