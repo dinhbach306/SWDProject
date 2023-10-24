@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const Account = require('./../models/entity/account');
+const Customer = require('./../models/entity/customer');
 const catchAsync = require('./../utils/catchAsync');
+const mongoose = require('mongoose');
+const validator = require('validator');
 const AppError = require('./../utils/appError');
 
 const signToken = (id) => {
@@ -17,20 +20,46 @@ const signToken = (id) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const newAccount = await Account.create({
-    phoneNumber: req.body.phoneNumber,
-    password: req.body.password,
-  });
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    //Check format birthday is like YYYY/MM/DD=
+    if (
+      req.body.birthday &&
+      !validator.isDate(req.body.birthDay, ['YYYY/MM/DD'])
+    ) {
+      return next(new AppError('Birthday is not correct format', 400));
+    }
 
-  const token = signToken(newAccount._id);
+    const newAccount = await Account.create({
+      phoneNumber: req.body.phoneNumber,
+      password: req.body.password,
+    });
 
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newAccount,
-    },
-  });
+    //add accountId to customer
+    const newCustomer = await Customer.create({
+      lastName: req.body.lastName,
+      firstName: req.body.firstName,
+      birthDay: req.body.birthDay,
+      address: req.body.address,
+      account: newAccount._id,
+    });
+    const token = signToken(newAccount._id);
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(201).json({
+      status: 'success',
+      token,
+      data: {
+        user: newAccount,
+      },
+    });
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    return next(err);
+  }
 });
 
 exports.login = catchAsync(async (req, res, next) => {
