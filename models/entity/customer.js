@@ -45,5 +45,14 @@ const customerSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   },
 );
+
+customerSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'account',
+    select: 'phoneNumber',
+  });
+  next();
+});
+
 const Customer = mongoose.model('Customer', customerSchema);
 module.exports = Customer;
