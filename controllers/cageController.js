@@ -7,10 +7,7 @@ exports.createCage = catchAsync(async (req, res, next) => {
   const newCage = await Cage.create(req.body);
 
   res.status(201).json({
-    status: 'success',
-    data: {
-      newCage,
-    },
+    status: 'create successfully',
   });
 });
 
@@ -49,10 +46,7 @@ exports.updateCage = catchAsync(async (req, res, next) => {
   });
   checkExistCage(cage);
   res.status(204).json({
-    status: 'success',
-    data: {
-      cage,
-    },
+    status: 'update successfully',
   });
 });
 
@@ -60,8 +54,19 @@ exports.deleteCage = catchAsync(async (req, res, next) => {
   const cage = await Cage.findByIdAndDelete(req.params.id);
   checkExistCage(cage);
   res.status(204).json({
+    status: 'delete successfully',
+  });
+});
+
+exports.getCageByName = catchAsync(async (req, res, next) => {
+  // LIKE OPERATOR
+  const cage = await Cage.find({ name: { $regex: req.body.name } });
+  checkExistCage(cage);
+  res.status(200).json({
     status: 'success',
-    data: null,
+    data: {
+      component: cage,
+    },
   });
 });
 
