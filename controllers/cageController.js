@@ -64,7 +64,7 @@ exports.aliasTopCageCheap = (req, res, next) => {
   next();
 };
 
-exports.getTop5CageByNameAndPrice = catchAsync(async (req, res, next) => {
+exports.getCageByName = catchAsync(async (req, res, next) => {
   // LIKE OPERATOR
   const features = new APIFeatures(
     Cage.find({ name: { $regex: req.body.name } }),

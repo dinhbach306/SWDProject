@@ -17,11 +17,8 @@ router
 
 router
   .route('/searchTopCageCheap')
-  .post(
-    cageController.aliasTopCageCheap,
-    cageController.getTop5CageByNameAndPrice,
-  );
+  .post(cageController.aliasTopCageCheap, cageController.getCageByName);
 
-router.route('/searchName').post(cageController.getTop5CageByNameAndPrice);
+router.route('/searchName').post(cageController.getCageByName);
 
 module.exports = router;
