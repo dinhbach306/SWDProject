@@ -80,11 +80,13 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect phone or password', 401));
   }
 
-  //3) If everything ok, send token to client
-  const token = signToken(account._id);
+  //3) If everything ok, send token and user data to client
+  const data = {};
+  data.account = account;
+  data.token = signToken(account._id);
   res.status(200).json({
     status: 'success',
-    token,
+    data,
   });
 });
 
