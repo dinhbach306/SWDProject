@@ -67,6 +67,6 @@ exports.deleteCustomer = catchAsync(async (req, res, next) => {
 
 function checkExistCustomer(customer) {
   if (!customer) {
-    return next(new AppError('No component found with that ID', 404));
+    return next(new AppError('No customer found with that ID', 404));
   }
 }

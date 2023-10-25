@@ -80,11 +80,13 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect phone or password', 401));
   }
 
-  //3) If everything ok, send token to client
-  const token = signToken(account._id);
+  //3) If everything ok, send token and user data to client
+  const data = {};
+  data.account = account;
+  data.token = signToken(account._id);
   res.status(200).json({
     status: 'success',
-    token,
+    data,
   });
 });
 
@@ -139,3 +141,23 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+//Get profile user
+exports.getUser = catchAsync(async (req, res, next) => {
+  const account = await Customer.findById(req.params.id)
+    .populate('account')
+    .exec();
+  checkExistAccount(account);
+  res.status(200).json({
+    status: 'success',
+    data: {
+      account,
+    },
+  });
+});
+
+function checkExistAccount(account) {
+  if (!account) {
+    return next(new AppError('No account found with that ID', 404));
+  }
+}
