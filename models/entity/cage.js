@@ -57,6 +57,12 @@ const cageSchema = new mongoose.Schema(
       default: 0,
     },
     imagePath: String,
+    image: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Image',
+      },
+    ],
     delFlg: {
       type: Boolean,
       default: false,

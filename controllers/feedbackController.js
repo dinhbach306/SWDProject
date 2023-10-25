@@ -1,3 +1,3 @@
-const Feedback = require('./../models/entity/feedback');
+const FeedbackAttachment = require('./../models/entity/feedbackAttachment');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
