@@ -141,3 +141,23 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+//Get profile user
+exports.getUser = catchAsync(async (req, res, next) => {
+  const account = await Customer.findById(req.params.id)
+    .populate('account')
+    .exec();
+  checkExistAccount(account);
+  res.status(200).json({
+    status: 'success',
+    data: {
+      account,
+    },
+  });
+});
+
+function checkExistAccount(account) {
+  if (!account) {
+    return next(new AppError('No account found with that ID', 404));
+  }
+}
