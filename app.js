@@ -10,6 +10,7 @@ const accountRouter = require('./routes/accountRouter');
 const cageRouter = require('./routes/cageRouter');
 const componentRouter = require('./routes/componentRouter');
 const imageRouter = require('./routes/imageRouter');
+const customerRouter = require('./routes/customerRouter');
 const AppError = require('./utils/appError');
 
 // 1) MIDDLEWARES
@@ -43,6 +44,7 @@ app.use('/api/v1/account', accountRouter);
 app.use('/api/v1/cage', cageRouter);
 app.use('/api/v1/component', componentRouter);
 app.use('/api/v1/image', imageRouter);
+app.use('/api/v1/customer', customerRouter);
 
 // 3) CACTH ALL ROUTES IF THE ROUTE IS NOT DEFINED
 app.all('*', (req, res, next) => {

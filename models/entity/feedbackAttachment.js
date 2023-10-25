@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const feedbackSchema = new mongoose.Schema(
+const feedbackAttachmentSchema = new mongoose.Schema(
   {
     path: Array,
     delFlg: {
@@ -20,5 +20,8 @@ const feedbackSchema = new mongoose.Schema(
   },
 );
 
-const Feedback = mongoose.model('Feedback', feedbackSchema);
-module.exports = Feedback;
+const FeedbackAttachment = mongoose.model(
+  'FeedbackAttachment',
+  feedbackAttachmentSchema,
+);
+module.exports = FeedbackAttachment;

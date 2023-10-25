@@ -29,7 +29,8 @@ exports.getAllCages = catchAsync(async (req, res, next) => {
 });
 
 exports.getCage = catchAsync(async (req, res, next) => {
-  const cage = await Cage.findById(req.params.id);
+  //Get cage and populate with image
+  const cage = await Cage.findById(req.params.id).populate('image').exec();
   checkExistCage(cage);
   res.status(200).json({
     status: 'success',
