@@ -68,6 +68,11 @@ const orderSchema = new mongoose.Schema(
   },
 );
 
+orderSchema.pre(/^find/, function (next) {
+  this.find({ delFlg: { $ne: true } });
+  next();
+});
+
 const Order = mongoose.model('Order', orderSchema);
 
 module.exports = Order;

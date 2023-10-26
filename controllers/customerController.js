@@ -57,7 +57,9 @@ exports.updateCustomer = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteCustomer = catchAsync(async (req, res, next) => {
-  const customer = await Customer.findByIdAndDelete(req.params.id);
+  const customer = await Customer.findByIdAndUpdate(req.params.id, {
+    delFlg: true,
+  });
   checkExistCustomer(customer);
   res.status(204).json({
     status: 'success',

@@ -43,5 +43,11 @@ const voucherSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   },
 );
+
+voucherSchema.pre(/^find/, function (next) {
+  this.find({ delFlg: { $ne: true } });
+  next();
+});
+
 const Voucher = mongoose.model('Voucher', voucherSchema);
 module.exports = Voucher;

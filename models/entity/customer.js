@@ -51,6 +51,7 @@ customerSchema.pre(/^find/, function (next) {
     path: 'account',
     select: 'phoneNumber',
   });
+  this.find({ delFlg: { $ne: true } });
   next();
 });
 
