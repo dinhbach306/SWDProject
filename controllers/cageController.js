@@ -1,10 +1,19 @@
 const Cage = require('./../models/entity/cage');
+const Image = require('./../models/entity/image');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/mongoUtils');
+const uploadFile = require('./../utils/uploadFile');
 
 exports.createCage = catchAsync(async (req, res, next) => {
-  const newCage = await Cage.create(req.body);
+  //Upload image
+  const img = uploadFile.uploadFile(req, res);
+  // const image = await Image.create(img);
+  // const imageId = (req.body.image = image._id);
+  // const imageName = (req.body.imagePath = image.name);
+  console.log(img);
+  //Create cage
+  // const cage = await Cage.create(req.body);
 
   res.status(201).json({
     status: 'create successfully',
@@ -12,7 +21,11 @@ exports.createCage = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllCages = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(Cage.find(), req.query)
+  //Get all cage without userId
+  const features = new APIFeatures(
+    Cage.find({ userId: { $exists: false } }),
+    req.query,
+  )
     .filter()
     .sort()
     .limitFields()
@@ -54,7 +67,7 @@ exports.updateCage = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteCage = catchAsync(async (req, res, next) => {
-  const cage = await Cage.findByIdAndDelete(req.params.id);
+  const cage = await Cage.findByIdAndUpdate(req.params.id, { delFlg: true });
   checkExistCage(cage);
   res.status(204).json({
     status: 'delete successfully',

@@ -24,5 +24,10 @@ const componentSchema = new mongoose.Schema(
   },
 );
 
+componentSchema.pre(/^find/, function (next) {
+  this.find({ delFlg: { $ne: true } });
+  next();
+});
+
 const Component = mongoose.model('Component', componentSchema);
 module.exports = Component;

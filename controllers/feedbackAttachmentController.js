@@ -61,8 +61,11 @@ exports.updateFeedbackAttachment = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteFeedbackAttachment = catchAsync(async (req, res, next) => {
-  const feedbackAttachment = await FeedbackAttachment.findByIdAndDelete(
+  const feedbackAttachment = await FeedbackAttachment.findByIdAndUpdate(
     req.params.id,
+    {
+      delFlg: true,
+    },
   );
   checkExistFeedbackAttachment(feedbackAttachment);
   res.status(204).json({

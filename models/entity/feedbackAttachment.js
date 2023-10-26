@@ -20,6 +20,11 @@ const feedbackAttachmentSchema = new mongoose.Schema(
   },
 );
 
+feedbackAttachmentSchema.pre(/^find/, function (next) {
+  this.find({ delFlg: { $ne: true } });
+  next();
+});
+
 const FeedbackAttachment = mongoose.model(
   'FeedbackAttachment',
   feedbackAttachmentSchema,

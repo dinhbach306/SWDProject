@@ -46,24 +46,15 @@ exports.uploadFile = cacthAsync(async (req, res) => {
 
     // Lấy đường dẫn công khai
     const downloadURL = await getDownloadURL(snapshot.ref);
-
-    console.log('Upload file successfully.');
-    const imageData = {};
-    imageData.name = newFileName;
-    imageData.type = req.file.mimetype;
-    imageData.downloadURL = downloadURL;
-    return imageData;
+    console.log('Upload file successfully.', downloadURL);
+    return downloadURL;
   } catch (error) {
     return res.status(400).send(error.message);
   }
 });
 
-const giveCurrentDateTime = () => {
-  const today = new Date();
-  const date =
-    today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-  const time =
-    today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-  const dateTime = date + ' ' + time;
+function giveCurrentDateTime() {
+  const date = new Date();
+  const dateTime = `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`;
   return dateTime;
-};
+}

@@ -57,7 +57,9 @@ exports.updateComponent = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteComponent = catchAsync(async (req, res, next) => {
-  const component = await Component.findByIdAndDelete(req.params.id);
+  const component = await Component.findByIdAndUpdate(req.params.id, {
+    delFlg: true,
+  });
   checkExistComponent(component);
   res.status(204).json({
     status: 'success',

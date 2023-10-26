@@ -20,5 +20,10 @@ const imageSchema = new mongoose.Schema(
   },
 );
 
+imageSchema.pre(/^find/, function (next) {
+  this.find({ delFlg: { $ne: true } });
+  next();
+});
+
 const Image = mongoose.model('Image', imageSchema);
 module.exports = Image;

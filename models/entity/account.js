@@ -48,6 +48,11 @@ accountSchema.pre('save', async function (next) {
   next();
 });
 
+accountSchema.pre(/^find/, function (next) {
+  this.find({ delFlg: { $ne: true } }); //Hàm này dùng để tìm những account có delFlg = false
+  next();
+});
+
 accountSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword,

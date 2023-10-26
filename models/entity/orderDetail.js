@@ -50,6 +50,11 @@ const orderDetailSchema = new mongoose.Schema(
   },
 );
 
+orderDetailSchema.pre(/^find/, function (next) {
+  this.find({ delFlg: { $ne: true } });
+  next();
+});
+
 const OrderDetail = mongoose.model('OrderDetail', orderDetailSchema);
 
 module.exports = OrderDetail;
