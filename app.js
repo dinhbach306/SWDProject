@@ -28,6 +28,7 @@ app.use(methodOverride('_method'));
 app.use(
   cors({
     origin: 'http://localhost:3000', //ENDPOINT FRONTEND
+    origin: '*',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   }),
