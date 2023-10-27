@@ -46,7 +46,7 @@ exports.uploadFile = cacthAsync(async (req, res) => {
 
     // Lấy đường dẫn công khai
     const downloadURL = await getDownloadURL(snapshot.ref);
-    console.log('Upload file successfully.', downloadURL);
+    console.log('Upload file successfully.');
     return downloadURL;
   } catch (error) {
     return res.status(400).send(error.message);
