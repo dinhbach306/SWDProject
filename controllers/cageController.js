@@ -4,16 +4,24 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/mongoUtils');
 const uploadFile = require('./../utils/uploadFile');
-
 exports.createCage = catchAsync(async (req, res, next) => {
   //Upload image
-  const img = uploadFile.uploadFile(req, res);
-  // const image = await Image.create(img);
-  // const imageId = (req.body.image = image._id);
-  // const imageName = (req.body.imagePath = image.name);
-  console.log(img);
-  //Create cage
-  // const cage = await Cage.create(req.body);
+  const mainImage = req.files.splice(0, 1);
+  const secondImage = req.files.splice(1, req.files.length - 1);
+  const secondImageArray = uploadFile.uploadFile(secondImage).then((data) => {
+    const image = Image.create({
+      imagePath: data,
+    }).then((data) => {
+      req.body.image = data._id;
+      //handle array image
+      // get the first image in array
+      const img = uploadFile.uploadFile(mainImage).then((data) => {
+        req.body.imagePath = data[0];
+
+        const cage = Cage.create(req.body);
+      });
+    });
+  });
 
   res.status(201).json({
     status: 'create successfully',
@@ -83,7 +91,10 @@ exports.aliasTopCageCheap = (req, res, next) => {
 exports.getCageByName = catchAsync(async (req, res, next) => {
   // LIKE OPERATOR
   const features = new APIFeatures(
-    Cage.find({ name: { $regex: req.body.name, '$options': 'i' }, delFlg: { $ne: true } }),
+    Cage.find({
+      name: { $regex: req.body.name },
+      delFlg: { $ne: true },
+    }),
     req.query,
   )
     .filter()
