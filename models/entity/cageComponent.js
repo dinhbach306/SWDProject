@@ -28,5 +28,9 @@ const cageComponentSchema = new mongoose.Schema(
   },
 );
 
+cageComponentSchema.pre(/^find/, function (next) {
+  this.find({ delFlg: { $ne: true } });
+  next();
+});
 const CageComponent = mongoose.model('CageComponent', cageComponentSchema);
 module.exports = CageComponent;
