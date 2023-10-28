@@ -7,12 +7,6 @@ const imageSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    cage: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Cage',
-      },
-    ],
   },
   {
     toJSON: { virtuals: true },

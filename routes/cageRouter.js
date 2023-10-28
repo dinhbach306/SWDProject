@@ -8,7 +8,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 router
   .route('/')
   .get(cageController.getAllCages)
-  .post(upload.single('filename'), cageController.createCage);
+  .post(upload.array('filenames'), cageController.createCage);
 
 router
   .route('/:id')
