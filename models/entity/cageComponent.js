@@ -13,12 +13,14 @@ const cageComponentSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.ObjectId,
         ref: 'Component',
+
+        quantity: {
+          type: Number,
+          default: 1,
+          required: [true, 'Please provide your quantity'],
+        },
       },
     ],
-    quantity: {
-      type: Number,
-      required: [true, 'Please provide your quantity'],
-    },
   },
   {
     toJSON: { virtuals: true },
