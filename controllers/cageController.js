@@ -27,7 +27,7 @@ exports.createCage = catchAsync(async (req, res, next) => {
   } else {
     const cage = await Cage.create(req.body);
     const cageComponent = await CageComponent.create({
-      cage: cage._id,
+      cage: [cage._id],
       component: req.body.componentId,
       quantity: req.body.quantity,
     });
