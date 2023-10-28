@@ -26,9 +26,9 @@ const io = new Server(server, {
 })
 io.on("connection", (socket) => {
   console.log(`User connected ${socket.id}`)
-  socket.on('send_order', (data) => {
+  socket.on('send_request_custom_cage', (data) => {
     console.log(data);
-    socket.broadcast.emit('receive_order', data)
+    socket.broadcast.emit('receive_request_custom_cage', data)
 
   })
 
