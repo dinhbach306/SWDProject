@@ -1,28 +1,37 @@
 const Cage = require('./../models/entity/cage');
 const Image = require('./../models/entity/image');
+const CageComponent = require('./../models/entity/cageComponent');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/mongoUtils');
 const uploadFile = require('./../utils/uploadFile');
 exports.createCage = catchAsync(async (req, res, next) => {
   //Upload image
-  const mainImage = req.files.splice(0, 1);
-  const secondImage = req.files.splice(1, req.files.length - 1);
-  const secondImageArray = uploadFile.uploadFile(secondImage).then((data) => {
-    const image = Image.create({
-      imagePath: data,
-    }).then((data) => {
-      req.body.image = data._id;
-      //handle array image
-      // get the first image in array
-      const img = uploadFile.uploadFile(mainImage).then((data) => {
-        req.body.imagePath = data[0];
+  if (!req.body.userId) {
+    const mainImage = req.files.splice(0, 1);
+    const secondImage = req.files.splice(1, req.files.length - 1);
+    const secondImageArray = uploadFile.uploadFile(secondImage).then((data) => {
+      const image = Image.create({
+        imagePath: data,
+      }).then((data) => {
+        req.body.image = data._id;
+        //handle array image
+        // get the first image in array
+        const img = uploadFile.uploadFile(mainImage).then((data) => {
+          req.body.imagePath = data[0];
 
-        const cage = Cage.create(req.body);
+          const cage = Cage.create(req.body);
+        });
       });
     });
-  });
-
+  } else {
+    const cage = await Cage.create(req.body);
+    const cageComponent = await CageComponent.create({
+      cage: cage._id,
+      component: req.body.componentId,
+      quantity: req.body.quantity,
+    });
+  }
   res.status(201).json({
     status: 'create successfully',
   });
