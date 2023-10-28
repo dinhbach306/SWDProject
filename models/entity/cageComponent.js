@@ -20,7 +20,7 @@ const cageComponentSchema = new mongoose.Schema(
         ref: 'Cage',
       },
     ],
-    components: [componentSchema],
+    component: [componentSchema],
   },
   {
     toJSON: { virtuals: true },
