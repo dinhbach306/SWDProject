@@ -13,7 +13,7 @@ router
 router
   .route('/:id')
   .get(cageController.getCage)
-  .patch(cageController.updateCage)
+  .patch(upload.single('filename'), cageController.updateCage)
   .delete(cageController.deleteCage);
 
 router

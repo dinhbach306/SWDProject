@@ -64,6 +64,8 @@ exports.getCage = catchAsync(async (req, res, next) => {
 });
 
 exports.updateCage = catchAsync(async (req, res, next) => {
+  const image = await uploadFile.uploadFile([req.file]);
+  req.body.imagePath = image[0];
   const cage = await Cage.findByIdAndUpdate(req.params.id, req.body, {
     new: true, //Nếu không có tạo mới
     runValidators: true, //Luôn chạy validator

@@ -15,10 +15,10 @@ initializeApp(config.firebaseConfig);
 // Khởi tạo Cloud Storage và lấy tham chiếu đến dịch vụ
 const storage = getStorage();
 
-exports.uploadFile = async (imageArray) => {
+exports.uploadFile = async (image) => {
   try {
     const uploadedImageUrls = [];
-    for (const imgName of imageArray) {
+    for (const imgName of image) {
       const dateTime = giveCurrentDateTime();
       const uid = uuidv4(); // Tạo một chuỗi ngẫu nhiên
       const originalName = imgName.originalname.split('.')[0]; // Lấy tên gốc của tệp
