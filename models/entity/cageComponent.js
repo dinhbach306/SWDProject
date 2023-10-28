@@ -1,6 +1,17 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
+const componentSchema = new mongoose.Schema({
+  type: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Component',
+  },
+  quantity: {
+    type: Number,
+    default: 1,
+  },
+});
+
 const cageComponentSchema = new mongoose.Schema(
   {
     cage: [
@@ -9,18 +20,7 @@ const cageComponentSchema = new mongoose.Schema(
         ref: 'Cage',
       },
     ],
-    component: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Component',
-
-        quantity: {
-          type: Number,
-          default: 1,
-          required: [true, 'Please provide your quantity'],
-        },
-      },
-    ],
+    component: [componentSchema],
   },
   {
     toJSON: { virtuals: true },
