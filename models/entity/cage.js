@@ -21,7 +21,7 @@ const cageSchema = new mongoose.Schema(
     },
     inStock: {
       type: Number,
-      required: [true, 'Please provide your inStock'],
+      // required: [true, 'Please provide your inStock'],
     },
     description: {
       type: String,
