@@ -24,15 +24,12 @@ router
     authController.restrictTo('staff', 'manager'),
     customerController.getCustomer,
   )
-  .patch(
-    authController.protect,
-    authController.restrictTo('staff', 'manager'),
-    customerController.updateCustomer,
-  )
   .delete(
     authController.protect,
     authController.restrictTo('staff', 'manager'),
     customerController.deleteCustomer,
   );
+
+router.route('/:accountId').patch(customerController.updateCustomer);
 
 module.exports = router;

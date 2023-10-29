@@ -43,10 +43,13 @@ exports.getCustomer = catchAsync(async (req, res, next) => {
 });
 
 exports.updateCustomer = catchAsync(async (req, res, next) => {
-  const customer = await Customer.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  const customer = await Customer.findOneAndUpdate(
+    {
+      account: req.params.accountId,
+    },
+    req.body,
+  );
+  console.log(customer);
   checkExistCustomer(customer);
   res.status(204).json({
     status: 'success',
