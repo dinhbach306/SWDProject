@@ -33,7 +33,7 @@ exports.getAllFeedbackAttachments = catchAsync(async (req, res, next) => {
 
 exports.getFeedbackAttachment = catchAsync(async (req, res, next) => {
   const feedbackAttachment = await FeedbackAttachment.findById(req.params.id);
-  checkExistFeedbackAttachment(feedbackAttachment);
+  checkExistFeedbackAttachment(feedbackAttachment, next);
   res.status(200).json({
     status: 'success',
     data: {
@@ -51,7 +51,7 @@ exports.updateFeedbackAttachment = catchAsync(async (req, res, next) => {
       runValidators: true,
     },
   );
-  checkExistFeedbackAttachment(feedbackAttachment);
+  checkExistFeedbackAttachment(feedbackAttachment, next);
   res.status(204).json({
     status: 'success',
     data: {
@@ -67,14 +67,14 @@ exports.deleteFeedbackAttachment = catchAsync(async (req, res, next) => {
       delFlg: true,
     },
   );
-  checkExistFeedbackAttachment(feedbackAttachment);
+  checkExistFeedbackAttachment(feedbackAttachment, next);
   res.status(204).json({
     status: 'success',
     data: null,
   });
 });
 
-function checkExistFeedbackAttachment(feedbackAttachment) {
+function checkExistFeedbackAttachment(feedbackAttachment, next) {
   if (!feedbackAttachment) {
     return next(new AppError('No feedbackAttachment found with that ID', 404));
   }

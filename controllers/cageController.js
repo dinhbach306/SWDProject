@@ -62,7 +62,7 @@ exports.getCage = catchAsync(async (req, res, next) => {
   const cage = await Cage.findById(req.params.id)
     .populate('image', 'imagePath')
     .exec();
-  checkExistCage(cage);
+  checkExistCage(cage, next);
   res.status(200).json({
     status: 'success',
     data: {
@@ -78,7 +78,7 @@ exports.updateCage = catchAsync(async (req, res, next) => {
     new: true, //Nếu không có tạo mới
     runValidators: true, //Luôn chạy validator
   });
-  checkExistCage(cage);
+  checkExistCage(cage, next);
   res.status(204).json({
     status: 'update successfully',
   });
@@ -86,7 +86,7 @@ exports.updateCage = catchAsync(async (req, res, next) => {
 
 exports.deleteCage = catchAsync(async (req, res, next) => {
   const cage = await Cage.findByIdAndUpdate(req.params.id, { delFlg: true });
-  checkExistCage(cage);
+  checkExistCage(cage, next);
   res.status(204).json({
     status: 'delete successfully',
   });
@@ -121,7 +121,7 @@ exports.getCageByName = catchAsync(async (req, res, next) => {
   });
 });
 
-function checkExistCage(cage) {
+function checkExistCage(cage, next) {
   if (!cage) {
     return next(new AppError('No component found with that ID', 404));
   }

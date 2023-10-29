@@ -31,7 +31,7 @@ exports.getAllVouchers = catchAsync(async (req, res, next) => {
 exports.getVoucher = catchAsync(async (req, res, next) => {
   //Get cage and populate with image
   const voucher = await Voucher.findById(req.params.id);
-  checkExistVoucher(voucher);
+  checkExistVoucher(voucher, next);
   res.status(200).json({
     status: 'success',
     data: {
@@ -45,7 +45,7 @@ exports.updateVoucher = catchAsync(async (req, res, next) => {
     new: true, //Nếu không có tạo mới
     runValidators: true, //Luôn chạy validator
   });
-  checkExistVoucher(voucher);
+  checkExistVoucher(voucher, next);
   res.status(204).json({
     status: 'update successfully',
   });
@@ -55,13 +55,13 @@ exports.deleteVoucher = catchAsync(async (req, res, next) => {
   const voucher = await Voucher.findByIdAndUpdate(req.params.id, {
     delFlg: true,
   });
-  checkExistVoucher(voucher);
+  checkExistVoucher(voucher, next);
   res.status(204).json({
     status: 'delete successfully',
   });
 });
 
-function checkExistVoucher(voucher) {
+function checkExistVoucher(voucher, next) {
   if (!voucher) {
     return next(new AppError('No voucher found with that ID', 404));
   }
