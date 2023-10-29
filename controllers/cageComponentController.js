@@ -3,41 +3,41 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/mongoUtils');
 
-exports.getAllCageComponents = catchAsync(async (req, res, next) => {
-  if (req.params.userId) {
-    const features = new APIFeatures(
-      CageComponent.find({ userId: req.params.userId, delFlg: false }),
-      req.query,
-    )
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
-    const cageComponents = await features.query;
+exports.getAllCageComponentsForStaff = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(CageComponent.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const cageComponents = await features.query;
 
-    res.status(200).json({
-      status: 'success',
-      results: cageComponents.length,
-      data: {
-        cageComponents,
-      },
-    });
-  } else {
-    const features = new APIFeatures(CageComponent.find(), req.query)
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
-    const cageComponents = await features.query;
+  res.status(200).json({
+    status: 'success',
+    results: cageComponents.length,
+    data: {
+      cageComponents,
+    },
+  });
+});
 
-    res.status(200).json({
-      status: 'success',
-      results: cageComponents.length,
-      data: {
-        cageComponents,
-      },
-    });
-  }
+exports.getAllCageComponentsForUser = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(
+    CageComponent.find({ userId: req.params.userId, delFlg: false }),
+    req.query,
+  )
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const cageComponents = await features.query;
+
+  res.status(200).json({
+    status: 'success',
+    results: cageComponents.length,
+    data: {
+      cageComponents,
+    },
+  });
 });
 
 exports.getCageComponent = catchAsync(async (req, res, next) => {
