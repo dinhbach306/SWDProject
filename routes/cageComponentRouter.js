@@ -4,6 +4,8 @@ const authController = require('./../controllers/authController');
 
 const router = express.Router();
 
+router.route.get(cageComponentController.getAllCageComponents);
+
 router.route('/:userId').get(cageComponentController.getAllCageComponents);
 
 router
