@@ -33,7 +33,7 @@ exports.getAllCustomers = catchAsync(async (req, res, next) => {
 
 exports.getCustomer = catchAsync(async (req, res, next) => {
   const customer = await Customer.findById(req.params.id);
-  checkExistCustomer(customer);
+  checkExistCustomer(customer, next);
   res.status(200).json({
     status: 'success',
     data: {
@@ -49,8 +49,7 @@ exports.updateCustomer = catchAsync(async (req, res, next) => {
     },
     req.body,
   );
-  console.log(customer);
-  checkExistCustomer(customer);
+  checkExistCustomer(customer, next);
   res.status(204).json({
     status: 'success',
     data: {
@@ -63,14 +62,14 @@ exports.deleteCustomer = catchAsync(async (req, res, next) => {
   const customer = await Customer.findByIdAndUpdate(req.params.id, {
     delFlg: true,
   });
-  checkExistCustomer(customer);
+  checkExistCustomer(customer, next);
   res.status(204).json({
     status: 'success',
     data: null,
   });
 });
 
-function checkExistCustomer(customer) {
+function checkExistCustomer(customer, next) {
   if (!customer) {
     return next(new AppError('No customer found with that ID', 404));
   }

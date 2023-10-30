@@ -25,7 +25,7 @@ exports.getAllImages = catchAsync(async (req, res, next) => {
 exports.getImage = catchAsync(async (req, res, next) => {
   //Get cage and populate with image
   const img = await Image.findById(req.params.id);
-  checkExistImage(img);
+  checkExistImage(img, next);
   res.status(200).json({
     status: 'success',
     data: {
@@ -48,7 +48,7 @@ exports.updateImage = catchAsync(async (req, res, next) => {
       runValidators: true,
     },
   );
-  checkExistImage(image);
+  checkExistImage(image, next);
   res.status(204).json({
     status: 'success',
     data: {
@@ -59,13 +59,13 @@ exports.updateImage = catchAsync(async (req, res, next) => {
 
 exports.deleteImage = catchAsync(async (req, res, next) => {
   const img = await Image.findByIdAndUpdate(req.params.id, { delFlg: true });
-  checkExistImage(img);
+  checkExistImage(img, next);
   res.status(204).json({
     status: 'delete successfully',
   });
 });
 
-function checkExistImage(cage) {
+function checkExistImage(cage, next) {
   if (!cage) {
     return next(new AppError('No image found with that ID', 404));
   }

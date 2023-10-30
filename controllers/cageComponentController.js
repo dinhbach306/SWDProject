@@ -3,9 +3,26 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/mongoUtils');
 
-exports.getAllCageComponents = catchAsync(async (req, res, next) => {
+exports.getAllCageComponentsForStaff = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(CageComponent.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const cageComponents = await features.query;
+
+  res.status(200).json({
+    status: 'success',
+    results: cageComponents.length,
+    data: {
+      cageComponents,
+    },
+  });
+});
+
+exports.getAllCageComponentsForUser = catchAsync(async (req, res, next) => {
   const features = new APIFeatures(
-    CageComponent.find({ userId: req.params.userId }),
+    CageComponent.find({ userId: req.params.userId, delFlg: false }),
     req.query,
   )
     .filter()
@@ -24,8 +41,10 @@ exports.getAllCageComponents = catchAsync(async (req, res, next) => {
 });
 
 exports.getCageComponent = catchAsync(async (req, res, next) => {
-  const cageComponent = await CageComponent.findById(req.params.id);
-  checkExistCageComponent(compocageComponentnent);
+  const cageComponent = await CageComponent.findById(req.params.id, {
+    delFlg: false,
+  });
+  checkExistCageComponent(compocageComponentnent, next);
   res.status(200).json({
     status: 'success',
     data: {
@@ -43,7 +62,7 @@ exports.updateCageComponent = catchAsync(async (req, res, next) => {
       runValidators: true, //Luôn chạy validator
     },
   );
-  checkExistCageComponent(cageComponent);
+  checkExistCageComponent(cageComponent, next);
   res.status(204).json({
     status: 'success',
     data: {
@@ -56,14 +75,14 @@ exports.deleteCageComponent = catchAsync(async (req, res, next) => {
   const cageComponent = await CageComponent.findByIdAndUpdate(req.params.id, {
     delFlg: true,
   });
-  checkExistCageComponent(cageComponent);
+  checkExistCageComponent(cageComponent, next);
   res.status(204).json({
     status: 'success',
     data: null,
   });
 });
 
-function checkExistCageComponent(cageComponent) {
+function checkExistCageComponent(cageComponent, next) {
   if (!cageComponent) {
     return next(new AppError('No cage component found with that ID', 404));
   }

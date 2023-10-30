@@ -33,7 +33,7 @@ exports.getAllComponents = catchAsync(async (req, res, next) => {
 
 exports.getComponent = catchAsync(async (req, res, next) => {
   const component = await Component.findById(req.params.id);
-  checkExistComponent(component);
+  checkExistComponent(component, next);
   res.status(200).json({
     status: 'success',
     data: {
@@ -47,7 +47,7 @@ exports.updateComponent = catchAsync(async (req, res, next) => {
     new: true, //Nếu không có tạo mới
     runValidators: true, //Luôn chạy validator
   });
-  checkExistComponent(component);
+  checkExistComponent(component, next);
   res.status(204).json({
     status: 'success',
     data: {
@@ -60,14 +60,14 @@ exports.deleteComponent = catchAsync(async (req, res, next) => {
   const component = await Component.findByIdAndUpdate(req.params.id, {
     delFlg: true,
   });
-  checkExistComponent(component);
+  checkExistComponent(component, next);
   res.status(204).json({
     status: 'success',
     data: null,
   });
 });
 
-function checkExistComponent(component) {
+function checkExistComponent(component, next) {
   if (!component) {
     return next(new AppError('No component found with that ID', 404));
   }
