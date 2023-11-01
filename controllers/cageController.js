@@ -73,19 +73,15 @@ exports.getCage = catchAsync(async (req, res, next) => {
 
 exports.updateCage = catchAsync(async (req, res, next) => {
   console.log('req.files', req.files);
-  if (req.files.length > 0 && req.files.filename) {
-    console.log('main');
-    const image = await uploadFile.uploadFile([req.files.filename[0]]);
-    req.body.imagePath = image[0];
-  }
-
-  const cage = await Cage.findByIdAndUpdate(req.params.id, req.body);
 
   if (req.files.filename) {
     console.log('main');
     const image = await uploadFile.uploadFile([req.files.filename[0]]);
     req.body.imagePath = image[0];
   }
+
+  const cage = await Cage.findByIdAndUpdate(req.params.id, req.body);
+  checkExistCage(cage, next);
 
   if (req.files.filenames) {
     console.log('phu');
@@ -102,7 +98,6 @@ exports.updateCage = catchAsync(async (req, res, next) => {
     );
     checkExistImage(image, next);
   }
-  checkExistCage(cage, next);
   res.status(204).json({
     status: 'update successfully',
   });
