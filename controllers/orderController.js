@@ -9,9 +9,10 @@ exports.createOrder = catchAsync(async (req, res, next) => {
   //update quantity cage
   const cages = await Cage.findById({
     _id: {
-      $in: req.body.cageId,
+      $in: req.body.cageArray.map((item) => item.cageId),
     },
   });
+
   const cageArray = req.body.cageArray;
 
   const isHasCage = cages.every((cage) => {
