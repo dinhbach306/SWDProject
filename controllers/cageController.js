@@ -91,6 +91,15 @@ exports.deleteCage = catchAsync(async (req, res, next) => {
     status: 'delete successfully',
   });
 });
+exports.getCustomCages = catchAsync(async (req, res, next) => {
+  const customCages = await Cage.find({ userId: req.user.id })
+  const customCagesComponent = await Promise.all(customCages.map(customCage =>
+    CageComponent.find({ cage: customCage._id })
+      .populate('cage')
+  ))
+
+  res.json(customCagesComponent)
+})
 
 exports.aliasTopCageCheap = (req, res, next) => {
   req.query.limit = '5';
