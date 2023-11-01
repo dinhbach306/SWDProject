@@ -81,7 +81,7 @@ exports.updateCage = catchAsync(async (req, res, next) => {
   }
 
   if (!req.files.filename) {
-    req.body.imagePath = null;
+    req.body.imagePath = undefined;
   }
 
   const cage = await Cage.findByIdAndUpdate(req.params.id, req.body);
