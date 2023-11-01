@@ -109,20 +109,10 @@ exports.updateCage = catchAsync(async (req, res, next) => {
 exports.updateCageCustom = catchAsync(async (req, res, next) => {
   const cage = await Cage.findById(req.params.cageId);
   checkExistCageWithStatus(cage, 'Pending', next);
-<<<<<<< HEAD
   
   handleUpdateCageCustomStatus(cage, req.body, next)
   
   
-=======
-  cage.status = 'CUS';
-  cage.price = req.body.price;
-  cage.description = req.body.description;
-  cage.save();
-  //save to database
-
-  //
->>>>>>> 6392e175e20ebbda57776a234757c8eb18341d46
   res.status(200).json({
     status: 'success',
     data: {
@@ -209,7 +199,9 @@ exports.getCageByName = catchAsync(async (req, res, next) => {
 exports.getAllCagesCustom = catchAsync(async (req, res, next) => {
   const features = new APIFeatures(
     Cage.find({
-      status: 'CUS',
+      status: {
+        $in: ['Pending', 'CUS', 'Reject'],
+      },
     }),
     req.query,
   ).filter()
