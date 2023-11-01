@@ -6,6 +6,7 @@ const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/mongoUtils');
 
 exports.createOrder = catchAsync(async (req, res, next) => {
+  console.log(req.body.cageId, req.body.cageArray)
   //update quantity cage
   const cages = await Cage.find({
     _id: {
@@ -16,10 +17,10 @@ exports.createOrder = catchAsync(async (req, res, next) => {
   const cageArray = req.body.cageArray;
 
   const isHasCage = cages.every((cage) => {
-    const _cageRequest = arrayQuantity.find((item) => item.cageId === cage.id);
+    const _cageRequest = cageArray.find((item) => item.cageId === cage.id);
     return cage.inStock - _cageRequest.quantity > 0;
   });
-
+  console.log(isHasCage)
   if (!isHasCage) {
     return next(new AppError('Not enough cage in stock', 400));
   }

@@ -160,6 +160,7 @@ exports.getUser = catchAsync(async (req, res, next) => {
     status: 'success',
     data: {
       customer,
+      status: account.status,
     },
   });
 });

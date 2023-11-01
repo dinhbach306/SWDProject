@@ -22,6 +22,7 @@ const accountSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      default: 'ACTIVE',
     },
     role: {
       type: String,
