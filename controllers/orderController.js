@@ -8,7 +8,7 @@ const APIFeatures = require('./../utils/mongoUtils');
 exports.createOrder = catchAsync(async (req, res, next) => {
   console.log(req.body.cageId, req.body.cageArray)
   //update quantity cage
-  const cages = await Cage.findById({
+  const cages = await Cage.find({
     _id: {
       $in: req.body.cageArray.map((item) => item.cageId),
     },

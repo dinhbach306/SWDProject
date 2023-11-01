@@ -3,8 +3,14 @@ const cageController = require('./../controllers/cageController');
 const authController = require('./../controllers/authController');
 const multer = require('multer');
 const router = express.Router();
+const mainImageUpload = multer({ storage: multer.memoryStorage() }).single(
+  'filename',
+);
 const upload = multer({ storage: multer.memoryStorage() });
-
+const arrayImageUpload = multer({ storage: multer.memoryStorage() }).array(
+  'filenames',
+  5,
+);
 router
   .route('/')
   .get(cageController.getAllCages)
@@ -13,7 +19,7 @@ router
 router
   .route('/:id')
   .get(cageController.getCage)
-  .patch(upload.single('filename'), cageController.updateCage)
+  .patch(mainImageUpload, arrayImageUpload, cageController.updateCage)
   .delete(cageController.deleteCage);
 
 router
@@ -22,13 +28,13 @@ router
 
 router.route('/searchName').post(cageController.getCageByName);
 
-router.route('/customCages/:userId')
-  .get(authController.protect,
-    cageController.getCustomCages)
+router
+  .route('/customCages/:userId')
+  .get(authController.protect, cageController.getCustomCages);
 
-router.route('/customCages/pending/:userId')
-  .get(authController.protect,
-    cageController.checkPending)
+router
+  .route('/customCages/pending/:userId')
+  .get(authController.protect, cageController.checkPending);
 
 router
   .route('/getAllWithDeletedItem')

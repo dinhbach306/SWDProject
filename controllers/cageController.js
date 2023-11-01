@@ -72,12 +72,25 @@ exports.getCage = catchAsync(async (req, res, next) => {
 });
 
 exports.updateCage = catchAsync(async (req, res, next) => {
-  const image = await uploadFile.uploadFile([req.file]);
-  req.body.imagePath = image[0];
-  const cage = await Cage.findByIdAndUpdate(req.params.id, req.body, {
-    new: true, //Nếu không có tạo mới
-    runValidators: true, //Luôn chạy validator
-  });
+  if (req.file) {
+    const image = await uploadFile.uploadFile([req.file]);
+    req.body.imagePath = image[0];
+  }
+  if (req.files) {
+    const data = await uploadFile.uploadFile(req.files);
+    const image = await Image.findByIdAndUpdate(
+      req.params.id,
+      {
+        imagePath: data,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+    checkExistImage(image, next);
+  }
+  const cage = await Cage.findByIdAndUpdate(req.params.id, req.body);
   checkExistCage(cage, next);
   res.status(204).json({
     status: 'update successfully',
@@ -92,33 +105,31 @@ exports.deleteCage = catchAsync(async (req, res, next) => {
   });
 });
 exports.getCustomCages = catchAsync(async (req, res, next) => {
-  const customCages = await Cage.find({ userId: req.user.id })
-  const customCagesComponent = await Promise.all(customCages.map(customCage =>
-    CageComponent.find({ cage: customCage._id })
-      .populate('cage')
+  const customCages = await Cage.find({ userId: req.user.id });
+  const customCagesComponent = await Promise.all(
+    customCages.map((customCage) =>
+      CageComponent.find({ cage: customCage._id }).populate('cage'),
+    ),
+  );
 
-  ))
-
-  res.json(customCagesComponent)
-
-})
+  res.json(customCagesComponent);
+});
 
 exports.checkPending = catchAsync(async (req, res, next) => {
-  const customCages = await Cage.find({ userId: req.user.id })
-  const customCagesComponent = await Promise.all(customCages.map(customCage =>
-    CageComponent.find({ cage: customCage._id })
-      .populate('cage')
-
-  ))
-  let isPending
-  customCagesComponent.forEach(cus => {
-    isPending = cus[0].cage.filter(i => i.status == 'Pending')
-
-  })
+  const customCages = await Cage.find({ userId: req.user.id });
+  const customCagesComponent = await Promise.all(
+    customCages.map((customCage) =>
+      CageComponent.find({ cage: customCage._id }).populate('cage'),
+    ),
+  );
+  let isPending;
+  customCagesComponent.forEach((cus) => {
+    isPending = cus[0].cage.filter((i) => i.status == 'Pending');
+  });
   if (isPending.length != 0) {
-    res.json("Pending")
+    res.json('Pending');
   }
-})
+});
 exports.aliasTopCageCheap = (req, res, next) => {
   req.query.limit = '5';
   req.query.sort = 'price';
@@ -127,9 +138,9 @@ exports.aliasTopCageCheap = (req, res, next) => {
 exports.getAllWithDeletedItem = catchAsync(async (req, res, next) => {
   //Get all cage without userId
   const features = new APIFeatures(
-    Cage.find({ userId: { $exists: false } }, delFlg = null),
+    Cage.find({ userId: { $exists: false } }, (delFlg = null)),
     req.query,
-  )
+  );
   const cages = await features.query;
 
   res.status(200).json({
@@ -166,5 +177,11 @@ exports.getCageByName = catchAsync(async (req, res, next) => {
 function checkExistCage(cage, next) {
   if (!cage) {
     return next(new AppError('No component found with that ID', 404));
+  }
+}
+
+function checkExistImage(cage, next) {
+  if (!cage) {
+    return next(new AppError('No image found with that ID', 404));
   }
 }
