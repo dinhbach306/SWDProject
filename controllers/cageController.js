@@ -72,9 +72,23 @@ exports.getCage = catchAsync(async (req, res, next) => {
 });
 
 exports.updateCage = catchAsync(async (req, res, next) => {
-  if (req.body.imagePath) {
-    req.body.imagePath = image[0];
+  if (req.file) {
     const image = await uploadFile.uploadFile([req.file]);
+    req.body.imagePath = image[0];
+  }
+  if (req.files) {
+    const data = await uploadFile.uploadFile(req.files);
+    const image = await Image.findByIdAndUpdate(
+      req.params.id,
+      {
+        imagePath: data,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+    checkExistImage(image, next);
   }
   const cage = await Cage.findByIdAndUpdate(req.params.id, req.body);
   checkExistCage(cage, next);
@@ -163,5 +177,11 @@ exports.getCageByName = catchAsync(async (req, res, next) => {
 function checkExistCage(cage, next) {
   if (!cage) {
     return next(new AppError('No component found with that ID', 404));
+  }
+}
+
+function checkExistImage(cage, next) {
+  if (!cage) {
+    return next(new AppError('No image found with that ID', 404));
   }
 }
