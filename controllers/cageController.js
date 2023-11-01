@@ -76,10 +76,11 @@ exports.updateCage = catchAsync(async (req, res, next) => {
     const image = await uploadFile.uploadFile([req.file]);
     req.body.imagePath = image[0];
   }
+  const cage = await Cage.findByIdAndUpdate(req.params.id, req.body);
   if (req.files) {
     const data = await uploadFile.uploadFile(req.files);
     const image = await Image.findByIdAndUpdate(
-      req.params.id,
+      cage.image,
       {
         imagePath: data,
       },
@@ -90,7 +91,6 @@ exports.updateCage = catchAsync(async (req, res, next) => {
     );
     checkExistImage(image, next);
   }
-  const cage = await Cage.findByIdAndUpdate(req.params.id, req.body);
   checkExistCage(cage, next);
   res.status(204).json({
     status: 'update successfully',
