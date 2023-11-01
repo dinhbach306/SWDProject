@@ -73,11 +73,13 @@ exports.getCage = catchAsync(async (req, res, next) => {
 
 exports.updateCage = catchAsync(async (req, res, next) => {
   if (req.file) {
+    console.log('main');
     const image = await uploadFile.uploadFile([req.file]);
     req.body.imagePath = image[0];
   }
   const cage = await Cage.findByIdAndUpdate(req.params.id, req.body);
   if (req.files) {
+    console.log('phu');
     const data = await uploadFile.uploadFile(req.files);
     const image = await Image.findByIdAndUpdate(
       cage.image,
@@ -96,7 +98,23 @@ exports.updateCage = catchAsync(async (req, res, next) => {
     status: 'update successfully',
   });
 });
+exports.updateCageCustom = catchAsync(async (req, res, next) => {
+  const cage = await Cage.findById(req.params.cageId);
+  checkExistCageWithStatus(cage, 'Pending', next);
+  cage.status = 'CUS';
+  cage.price = req.body.price;
+  cage.description = req.body.description;
+  cage.save();
+  //save to database
 
+  //
+  res.status(200).json({
+    status: 'success',
+    data: {
+      component: cage,
+    },
+  });
+});
 exports.deleteCage = catchAsync(async (req, res, next) => {
   const cage = await Cage.findByIdAndUpdate(req.params.id, { delFlg: true });
   checkExistCage(cage, next);
@@ -138,11 +156,10 @@ exports.aliasTopCageCheap = (req, res, next) => {
 exports.getAllWithDeletedItem = catchAsync(async (req, res, next) => {
   //Get all cage without userId
   const features = new APIFeatures(
-    Cage.find({ userId: { $exists: false } }, (delFlg = null)),
+    Cage.find({ userId: { $exists: false } }).set('querySetting', 'all'),
     req.query,
   );
   const cages = await features.query;
-
   res.status(200).json({
     status: 'success',
     results: cages.length,
@@ -166,6 +183,7 @@ exports.getCageByName = catchAsync(async (req, res, next) => {
     .paginate();
 
   const cage = await features.query;
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -177,6 +195,17 @@ exports.getCageByName = catchAsync(async (req, res, next) => {
 function checkExistCage(cage, next) {
   if (!cage) {
     return next(new AppError('No component found with that ID', 404));
+  }
+}
+function checkExistCageWithStatus(cage, status, next) {
+  checkExistCage(cage, next);
+  if (cage.status != status) {
+    return next(
+      new AppError(
+        'No component found with that ID and status: ' + status,
+        404,
+      ),
+    );
   }
 }
 
