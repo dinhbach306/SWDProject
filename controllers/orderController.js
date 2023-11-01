@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const authController = require('./authController');
 const Order = require('./../models/entity/order');
+const Account = require('./../models/entity/account');
+const Customer = require('./../models/entity/customer');
 const OrderDetail = require('./../models/entity/orderDetail');
 const Cage = require('./../models/entity/cage');
 const catchAsync = require('./../utils/catchAsync');
@@ -156,6 +158,33 @@ exports.updateStatus = catchAsync(async (req, res, next) => {
   checkExitsOrder(order, next);
   res.status(204).json({
     status: 'update successfully',
+  });
+});
+
+exports.getOrderByUser = catchAsync(async (req, res, next) => {
+  const account = await Account.findById(req.params.userId);
+  const customer = await Customer.findOne({
+    account: account._id,
+  });
+
+  console.log(customer);
+  const orders = await Order.find({
+    customer: [customer._id],
+  });
+
+  const orderByStatus = orders.reduce((result, item) => {
+    if (result[item.status]) {
+      result[item.status].push(item);
+    } else {
+      result[item.status] = [item];
+    }
+    return result;
+  }, {});
+
+  res.status(200).json({
+    status: 'success',
+    results: orders.length,
+    orderByStatus,
   });
 });
 
