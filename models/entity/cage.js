@@ -43,7 +43,7 @@ const cageSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: {
-        values: ['Available', 'Pending', 'CUS', 'Reject', 'UnAvailable'],
+        values: ['Available', 'Pending', 'CUS', 'Reject', 'Done', 'UnAvailable'],
         message: 'status is either',
       },
     },
@@ -79,9 +79,9 @@ cageSchema.pre(/^find/, function (next) {
   // default query not deleted item
   if (querySetting == null) {
     filter.delFlg = false;
-  }else if(querySetting == 'deleted'){
+  } else if (querySetting == 'deleted') {
     filter.delFlg = true;
-  }else if (querySetting == "all"){
+  } else if (querySetting == "all") {
 
   }
   // other means query all item

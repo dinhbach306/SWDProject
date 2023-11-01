@@ -4,23 +4,22 @@ const Cage = require('./../models/entity/cage');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/mongoUtils');
-
 exports.createOrder = catchAsync(async (req, res, next) => {
-  console.log(req.body.cageId, req.body.cageArray)
   //update quantity cage
   const cages = await Cage.find({
     _id: {
       $in: req.body.cageArray.map((item) => item.cageId),
     },
+    userId: { $exists: false }
   });
-
-  const cageArray = req.body.cageArray;
-
+  const customArray = req.body.cageArray.filter(cage => cage.isCustom === true)
+  const cageArray = req.body.cageArray.filter(cage => cage.isCustom === false);
+  console.log("customArray", customArray)
   const isHasCage = cages.every((cage) => {
     const _cageRequest = cageArray.find((item) => item.cageId === cage.id);
     return cage.inStock - _cageRequest.quantity > 0;
   });
-  console.log(isHasCage)
+
   if (!isHasCage) {
     return next(new AppError('Not enough cage in stock', 400));
   }
@@ -43,6 +42,18 @@ exports.createOrder = catchAsync(async (req, res, next) => {
   const quantityTotal = cageArray.reduce((total, item) => {
     return total + item.quantity;
   }, 0);
+  if (customArray.length != 0) {
+    const newStatusCage = await Cage.findByIdAndUpdate({ _id: customArray[0].cageId }, { status: "Done" });
+    const customOrderDetails = await OrderDetail.insertMany(
+      customArray.map((item) => ({
+        order: newOrder._id,
+        price: item.price,
+        cage: [item.cageId],
+        quantity: 1,
+      }))
+    )
+  }
+
 
   const newOrder = await Order.create({
     status: req.body.status,
