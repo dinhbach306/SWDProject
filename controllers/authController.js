@@ -144,14 +144,19 @@ exports.restrictTo = (...roles) => {
 
 //Get profile user
 exports.getUser = catchAsync(async (req, res, next) => {
-  const account = await Customer.findById(req.params.id)
-    .populate('account')
+  const account = await Account.findById(req.params.id);
+  console.log(account._id);
+  //Not get account
+  const customer = await Customer.find({
+    account: account._id,
+  })
+    .select('-account')
     .exec();
   checkExistAccount(account);
   res.status(200).json({
     status: 'success',
     data: {
-      account,
+      customer,
     },
   });
 });
