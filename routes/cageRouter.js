@@ -22,4 +22,8 @@ router
 
 router.route('/searchName').post(cageController.getCageByName);
 
+router.route('/customCages/:userId')
+  .get(authController.protect,
+    cageController.getCustomCages)
+
 module.exports = router;
