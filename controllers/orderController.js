@@ -7,11 +7,12 @@ const APIFeatures = require('./../utils/mongoUtils');
 
 exports.createOrder = catchAsync(async (req, res, next) => {
   //update quantity cage
-  const cages = await Cage.findById({
+  const cages = await Cage.find({
     _id: {
-      $in: req.body.cageId,
+      $in: req.body.cageArray.map((item) => item.cageId),
     },
   });
+
   const cageArray = req.body.cageArray;
 
   const isHasCage = cages.every((cage) => {
@@ -26,8 +27,14 @@ exports.createOrder = catchAsync(async (req, res, next) => {
   Cage.bulkWrite(
     cageArray.map((item) => ({
       updateOne: {
-        filter: { _id: item.cageId },
-        update: { $inc: { inStock: -item.quantity } },
+        filter: { id: item.cageId },
+        update: {
+          $set: {
+            inStock:
+              cages.find((cage) => cage.id === item.cageId).inStock -
+              item.quantity,
+          },
+        },
       },
     })),
   );
@@ -36,14 +43,23 @@ exports.createOrder = catchAsync(async (req, res, next) => {
     return total + item.quantity;
   }, 0);
 
-  const newOrder = await Order.create(req.body);
-
-  const orderDetails = await OrderDetail.create({
-    order: newOrder._id,
-    price: req.body.price,
-    cage: req.body.cageId,
-    quantity: quantityTotal,
+  const newOrder = await Order.create({
+    status: req.body.status,
+    paymentDate: req.body.paymentDate,
+    address: req.body.address,
+    total: req.body.total,
+    shipFee: req.body.shipFee,
+    customer: req.body.customerId,
   });
+
+  const orderDetails = await OrderDetail.insertMany(
+    cageArray.map((item) => ({
+      order: newOrder._id,
+      price: item.price,
+      cage: [item.cageId],
+      quantity: item.quantity,
+    })),
+  );
 
   res.status(201).json({
     status: 'create successfully',
