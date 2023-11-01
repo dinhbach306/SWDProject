@@ -93,6 +93,7 @@ exports.login = catchAsync(async (req, res, next) => {
 exports.protect = catchAsync(async (req, res, next) => {
   //1) Getting token and check if it's there
   let token;
+
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
@@ -108,8 +109,9 @@ exports.protect = catchAsync(async (req, res, next) => {
   //2) Verification token
   // 2) Verification token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
   //3) Check if user still exists
-  const currentUser = await User.findById(decoded.id);
+  const currentUser = await Account.findById(decoded.id);
   if (!currentUser) {
     return next(
       new AppError(
@@ -118,12 +120,12 @@ exports.protect = catchAsync(async (req, res, next) => {
       ),
     );
   }
-  //4) Check if user changed password after the token was issued
-  if (currentUser.changedPasswordAfter(decoded.iat)) {
-    return next(
-      new AppError('User recently changed password! Please log in again.', 401),
-    );
-  }
+  // //4) Check if user changed password after the token was issued
+  // if (currentUser.changedPasswordAfter(decoded.iat)) {
+  //   return next(
+  //     new AppError('User recently changed password! Please log in again.', 401),
+  //   );
+  // }
 
   // GRANT ACCESS TO PROTECTED ROUTE
   req.user = currentUser;
@@ -147,6 +149,7 @@ exports.getUser = catchAsync(async (req, res, next) => {
   const account = await Customer.findById(req.params.id)
     .populate('account')
     .exec();
+  console.log(account);
   checkExistAccount(account);
   res.status(200).json({
     status: 'success',
