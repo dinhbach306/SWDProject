@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const AppError = require('../../utils/appError');
 
 const cageSchema = new mongoose.Schema(
   {
@@ -18,9 +19,11 @@ const cageSchema = new mongoose.Schema(
     height: {
       type: Number,
       required: [true, 'Please provide your height'],
+      
     },
     inStock: {
       type: Number,
+
       // required: [true, 'Please provide your inStock'],
     },
     description: {
@@ -39,6 +42,7 @@ const cageSchema = new mongoose.Schema(
     price: {
       type: Number,
       maxLength: 9,
+      min: [0, 'Price must be a positive number']
     },
     status: {
       type: String,

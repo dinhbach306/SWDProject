@@ -1,9 +1,15 @@
+const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
+const authController = require('./authController');
 const Order = require('./../models/entity/order');
 const OrderDetail = require('./../models/entity/orderDetail');
 const Cage = require('./../models/entity/cage');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/mongoUtils');
+const Account = require('./../models/entity/account');
+const Customer = require('./../models/entity/customer');
+const { log } = require('console');
 
 exports.createOrder = catchAsync(async (req, res, next) => {
   //update quantity cage
@@ -112,10 +118,28 @@ exports.updateOrder = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteOrder = catchAsync(async (req, res, next) => {
-  const order = await Order.findByIdAndUpdate(req.params.id, {
-    delFlg: true,
-  });
-  checkExitsOrder(order, next);
+  const token = req.headers.authorization?.split(' ')[1];
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  console.log(decoded);
+  console.log("id", decoded.id)
+  const order = await Order.findById(req.params.id);
+  console.log(order);
+  const account = await Account.findById(decoded.id);
+
+  //Not get account
+  const currentUser = await Customer.find({
+    account: account._id,
+  })
+    .select('-account')
+    .exec();
+  console.log(currentUser);
+  checkCurrentCustomerHasOrder(currentUser, order, next);
+  order.status = "Canceled";
+  order.save();
+  // const order = await Order.findByIdAndUpdate(req.params.id, {
+  //   delFlg: true,
+  // });
+  // checkExitsOrder(order, next);
   res.status(204).json({
     status: 'delete successfully',
   });
@@ -138,5 +162,14 @@ exports.updateStatus = catchAsync(async (req, res, next) => {
 function checkExitsOrder(voucher, next) {
   if (!voucher) {
     return next(new AppError('No voucher found with that ID', 404));
+  }
+}
+// check if current customer has purchase order (by id) or not
+function checkCurrentCustomerHasOrder(customer, order, next) {
+  if (!customer || !order || customer._id != order.customer._id) {
+    return next(new AppError('No account found with that ID', 404));
+  }
+  if(order.status != 'Processing'){
+    return next(new AppError('Order is status is not processing', 404));
   }
 }
