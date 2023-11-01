@@ -109,13 +109,10 @@ exports.updateCage = catchAsync(async (req, res, next) => {
 exports.updateCageCustom = catchAsync(async (req, res, next) => {
   const cage = await Cage.findById(req.params.cageId);
   checkExistCageWithStatus(cage, 'Pending', next);
-  cage.status = 'CUS';
-  cage.price = req.body.price;
-  cage.description = req.body.description;
-  cage.save();
-  //save to database
-
-  //
+  
+  handleUpdateCageCustomStatus(cage, req.body, next)
+  
+  
   res.status(200).json({
     status: 'success',
     data: {
@@ -199,7 +196,27 @@ exports.getCageByName = catchAsync(async (req, res, next) => {
     },
   });
 });
+exports.getAllCagesCustom = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(
+    Cage.find({
+      status: {
+        $in: ['Pending', 'CUS', 'Reject'],
+      },
+    }),
+    req.query,
+  ).filter()
+  .sort()
+  .limitFields()
+  .paginate();
+  const cage = await features.query;
 
+  res.status(200).json({
+    status: 'success',
+    data: {
+      component: cage,
+    },
+  });
+});
 function checkExistCage(cage, next) {
   if (!cage) {
     return next(new AppError('No component found with that ID', 404));
@@ -221,4 +238,23 @@ function checkExistImage(cage, next) {
   if (!cage) {
     return next(new AppError('No image found with that ID', 404));
   }
+}
+function handleUpdateCageCustomStatus(cage, requestBody, next){
+  const status = requestBody.status;
+  switch (status) {
+    case "Reject" :
+    case "CUS":
+      cage.status = status;
+      break;
+    default: 
+      return next(new AppError('Invalid cage status: ' + status, 400));
+  }
+  const newPrice = requestBody.price;
+  const newDescription = requestBody.description;
+  if(!newPrice || !newDescription){
+    return next(new AppError('cage price or description is not specified!!', 400));
+  }
+  cage.price = requestBody.price;
+  cage.description = requestBody.description;
+  cage.save();
 }
