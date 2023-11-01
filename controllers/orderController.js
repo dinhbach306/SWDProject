@@ -121,6 +121,20 @@ exports.deleteOrder = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.updateStatus = catchAsync(async (req, res, next) => {
+  const order = await Order.findByIdAndUpdate(
+    req.params.id,
+    { status: req.body.status },
+    {
+      runValidators: true, //Luôn chạy validator
+    },
+  );
+  checkExitsOrder(order, next);
+  res.status(204).json({
+    status: 'update successfully',
+  });
+});
+
 function checkExitsOrder(voucher, next) {
   if (!voucher) {
     return next(new AppError('No voucher found with that ID', 404));
