@@ -28,8 +28,14 @@ exports.createOrder = catchAsync(async (req, res, next) => {
   Cage.bulkWrite(
     cageArray.map((item) => ({
       updateOne: {
-        filter: { _id: item.cageId },
-        update: { $inc: { inStock: -item.quantity } },
+        filter: { id: item.cageId },
+        update: {
+          $set: {
+            inStock:
+              cages.find((cage) => cage.id === item.cageId).inStock -
+              item.quantity,
+          },
+        },
       },
     })),
   );
