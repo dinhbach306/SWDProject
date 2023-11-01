@@ -44,12 +44,19 @@ exports.createOrder = catchAsync(async (req, res, next) => {
     return total + item.quantity;
   }, 0);
 
-  const newOrder = await Order.create(req.body);
+  const newOrder = await Order.create({
+    status: req.body.status,
+    paymentDate: req.body.paymentDate,
+    address: req.body.address,
+    total: req.body.total,
+    shipFee: req.body.shipFee,
+    customer: req.body.customerId,
+  });
 
   const orderDetails = await OrderDetail.create({
     order: newOrder._id,
     price: req.body.price,
-    cage: req.body.cageId,
+    cage: req.body.cageArray.map((item) => item.cageId),
     quantity: quantityTotal,
   });
 
