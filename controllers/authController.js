@@ -6,6 +6,7 @@ const catchAsync = require('./../utils/catchAsync');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const AppError = require('./../utils/appError');
+const APIFeatures = require('./../utils/mongoUtils');
 
 const signToken = (id) => {
   return jwt.sign(
@@ -161,6 +162,45 @@ exports.getUser = catchAsync(async (req, res, next) => {
     data: {
       customer,
       status: account.status,
+    },
+  });
+});
+
+//Get all user depend on role
+exports.getAllUser = catchAsync(async (req, res, next) => {
+  let customers;
+  if (req.params.role === 'admin') {
+    const features = new APIFeatures(Account.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const accounts = await features.query;
+    customers = await Customer.find({
+      account: accounts.map((account) => account._id),
+    })
+      .select('firstName lastName birthDay address')
+      .populate('account', 'phoneNumber' + 'role');
+  }
+
+  if (req.params.role === 'manager') {
+    const features = new APIFeatures(Account.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const accounts = await features.query;
+    customers = await Customer.find({
+      account: accounts.map((account) => account._id),
+      $ne: { role: 'admin' },
+    })
+      .select('firstName lastName birthDay address')
+      .populate('account', 'phoneNumber' + 'role');
+  }
+  res.status(200).json({
+    status: 'success',
+    data: {
+      customers,
     },
   });
 });
