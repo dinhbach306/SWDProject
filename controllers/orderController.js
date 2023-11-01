@@ -52,12 +52,14 @@ exports.createOrder = catchAsync(async (req, res, next) => {
     customer: req.body.customerId,
   });
 
-  const orderDetails = await OrderDetail.create({
-    order: newOrder._id,
-    price: req.body.price,
-    cage: req.body.cageArray.map((item) => item.cageId),
-    quantity: quantityTotal,
-  });
+  const orderDetails = await OrderDetail.insertMany(
+    cageArray.map((item) => ({
+      order: newOrder._id,
+      price: item.price,
+      cage: [item.cageId],
+      quantity: item.quantity,
+    })),
+  );
 
   res.status(201).json({
     status: 'create successfully',
