@@ -15,4 +15,6 @@ router
   .patch(orderController.updateOrder)
   .delete(orderController.deleteOrder);
 
+router.route('/updateStatus/:id').patch(orderController.updateStatus);
+
 module.exports = router;
