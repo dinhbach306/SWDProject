@@ -96,17 +96,50 @@ exports.getCustomCages = catchAsync(async (req, res, next) => {
   const customCagesComponent = await Promise.all(customCages.map(customCage =>
     CageComponent.find({ cage: customCage._id })
       .populate('cage')
+
   ))
 
   res.json(customCagesComponent)
+
 })
 
+exports.checkPending = catchAsync(async (req, res, next) => {
+  const customCages = await Cage.find({ userId: req.user.id })
+  const customCagesComponent = await Promise.all(customCages.map(customCage =>
+    CageComponent.find({ cage: customCage._id })
+      .populate('cage')
+
+  ))
+  let isPending
+  customCagesComponent.forEach(cus => {
+    isPending = cus[0].cage.filter(i => i.status == 'Pending')
+
+  })
+  if (isPending.length != 0) {
+    res.json("Pending")
+  }
+})
 exports.aliasTopCageCheap = (req, res, next) => {
   req.query.limit = '5';
   req.query.sort = 'price';
   next();
 };
+exports.getAllWithDeletedItem = catchAsync(async (req, res, next) => {
+  //Get all cage without userId
+  const features = new APIFeatures(
+    Cage.find({ userId: { $exists: false } }, delFlg = null),
+    req.query,
+  )
+  const cages = await features.query;
 
+  res.status(200).json({
+    status: 'success',
+    results: cages.length,
+    data: {
+      cages,
+    },
+  });
+});
 exports.getCageByName = catchAsync(async (req, res, next) => {
   // LIKE OPERATOR
   const features = new APIFeatures(

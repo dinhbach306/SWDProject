@@ -135,7 +135,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 //Authorize
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.account.role)) {
+    if (!roles.includes(req.user.role)) {
       return next(
         new AppError('You do not have permission to perform this action', 403),
       );
@@ -147,14 +147,14 @@ exports.restrictTo = (...roles) => {
 //Get profile user
 exports.getUser = catchAsync(async (req, res, next) => {
   const account = await Account.findById(req.params.id);
-  console.log(account._id);
+
   //Not get account
   const customer = await Customer.find({
     account: account._id,
   })
     .select('-account')
     .exec();
-  console.log(account);
+
   checkExistAccount(account);
   res.status(200).json({
     status: 'success',

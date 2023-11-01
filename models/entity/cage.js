@@ -72,10 +72,13 @@ const cageSchema = new mongoose.Schema(
   },
 );
 
-cageSchema.pre(/^find/, function (next) {
-  this.find({ delFlg: { $ne: true } });
+cageSchema.pre(/^find/, function (next, delFlg = true) {
+  const filter = {};
+  if (delFlg != null) {
+    filter.delFlg = { $ne: delFlg }
+  }
+  this.find();
   next();
 });
-
 const Cage = mongoose.model('Cage', cageSchema);
 module.exports = Cage;

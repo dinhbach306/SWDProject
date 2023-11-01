@@ -26,4 +26,16 @@ router.route('/customCages/:userId')
   .get(authController.protect,
     cageController.getCustomCages)
 
+router.route('/customCages/pending/:userId')
+  .get(authController.protect,
+    cageController.checkPending)
+
+router
+  .route('/getAllWithDeletedItem')
+  .post(
+    authController.protect,
+    authController.restrictTo('admin', 'staff', 'manager'),
+    cageController.getAllWithDeletedItem,
+  );
+
 module.exports = router;
