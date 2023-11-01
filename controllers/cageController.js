@@ -1,10 +1,13 @@
 const Cage = require('./../models/entity/cage');
 const Image = require('./../models/entity/image');
 const CageComponent = require('./../models/entity/cageComponent');
+const Component = require('./../models/entity/component');
+
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/mongoUtils');
 const uploadFile = require('./../utils/uploadFile');
+const dayjs = require('dayjs');
 exports.createCage = catchAsync(async (req, res, next) => {
   //Upload image
   if (!req.body.userId) {
@@ -17,9 +20,11 @@ exports.createCage = catchAsync(async (req, res, next) => {
         req.body.image = data._id;
         //handle array image
         // get the first image in array
-        const img = uploadFile.uploadFile(mainImage).then((data) => {
-          req.body.imagePath = data[0];
+          const img = uploadFile.uploadFile(mainImage).then((data) => {
+          const requestBody = req.body;
 
+          requestBody.imagePath = data[0];
+          requestBody.createDate = dayjs().format('YYYY/MM/DD')
           const cage = Cage.create(req.body);
         });
       });
@@ -107,6 +112,7 @@ exports.updateCage = catchAsync(async (req, res, next) => {
   });
 });
 exports.updateCageCustom = catchAsync(async (req, res, next) => {
+  console.log(req.params.cageId)
   const cage = await Cage.findById(req.params.cageId);
   checkExistCageWithStatus(cage, 'Pending', next);
   
@@ -125,6 +131,40 @@ exports.deleteCage = catchAsync(async (req, res, next) => {
   checkExistCage(cage, next);
   res.status(204).json({
     status: 'delete successfully',
+  });
+});
+exports.getAllCagesCustom = catchAsync(async (req, res, next) => {
+  const customCages = await Cage.find({
+    status: {
+      $in: ['Pending'],
+    },
+  })
+  console.log(customCages);
+
+  const customCagesComponent = await Promise.all(
+    customCages.map(async (customCage) =>{
+      return await CageComponent.find({ cage: customCage._id }).populate('cage');
+     
+    }),
+  );
+  const features = new APIFeatures(
+    customCagesComponent
+    // .populate({
+    //   path: "CageComponent", 
+    //   populate: {
+    //     path: "Component"
+    //   }
+    // })
+    ,
+    req.query,
+  );
+  const cage = await features.query;
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      component: cage,
+    },
   });
 });
 exports.getCustomCages = catchAsync(async (req, res, next) => {
@@ -196,33 +236,14 @@ exports.getCageByName = catchAsync(async (req, res, next) => {
     },
   });
 });
-exports.getAllCagesCustom = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(
-    Cage.find({
-      status: {
-        $in: ['Pending', 'CUS', 'Reject'],
-      },
-    }),
-    req.query,
-  ).filter()
-  .sort()
-  .limitFields()
-  .paginate();
-  const cage = await features.query;
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      component: cage,
-    },
-  });
-});
 function checkExistCage(cage, next) {
   if (!cage) {
     return next(new AppError('No component found with that ID', 404));
   }
 }
 function checkExistCageWithStatus(cage, status, next) {
+  console.log(cage)
   checkExistCage(cage, next);
   if (cage.status != status) {
     return next(

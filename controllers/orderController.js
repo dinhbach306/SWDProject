@@ -1,9 +1,18 @@
+const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
+const authController = require('./authController');
 const Order = require('./../models/entity/order');
+const Account = require('./../models/entity/account');
+const Customer = require('./../models/entity/customer');
 const OrderDetail = require('./../models/entity/orderDetail');
 const Cage = require('./../models/entity/cage');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/mongoUtils');
+const Account = require('./../models/entity/account');
+const Customer = require('./../models/entity/customer');
+const { log } = require('console');
+
 exports.createOrder = catchAsync(async (req, res, next) => {
   //update quantity cage
   const cages = await Cage.find({
@@ -20,6 +29,7 @@ exports.createOrder = catchAsync(async (req, res, next) => {
     return cage.inStock - _cageRequest.quantity > 0;
   });
 
+  console.log(isHasCage);
   if (!isHasCage) {
     return next(new AppError('Not enough cage in stock', 400));
   }
@@ -85,13 +95,19 @@ exports.getAllOrders = catchAsync(async (req, res, next) => {
     .limitFields()
     .paginate();
   const orders = await features.query;
+  const orderByStatus = orders.reduce((result, item) => {
+    if (result[item.status]) {
+      result[item.status].push(item);
+    } else {
+      result[item.status] = [item];
+    }
+    return result;
+  }, {});
 
   res.status(200).json({
     status: 'success',
     results: orders.length,
-    data: {
-      orders,
-    },
+    orderByStatus,
   });
 });
 
@@ -118,17 +134,85 @@ exports.updateOrder = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteOrder = catchAsync(async (req, res, next) => {
-  const order = await Order.findByIdAndUpdate(req.params.id, {
-    delFlg: true,
-  });
-  checkExitsOrder(order, next);
+  const token = req.headers.authorization?.split(' ')[1];
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  console.log(decoded);
+  console.log("id", decoded.id)
+  const order = await Order.findById(req.params.id);
+  console.log(order);
+  const account = await Account.findById(decoded.id);
+
+  //Not get account
+  const currentUser = await Customer.find({
+    account: account._id,
+  })
+    .select('-account')
+    .exec();
+  console.log(currentUser);
+  checkCurrentCustomerHasOrder(currentUser, order, next);
+  order.status = "Canceled";
+  order.save();
+  // const order = await Order.findByIdAndUpdate(req.params.id, {
+  //   delFlg: true,
+  // });
+  // checkExitsOrder(order, next);
   res.status(204).json({
     status: 'delete successfully',
+  });
+});
+
+exports.updateStatus = catchAsync(async (req, res, next) => {
+  const order = await Order.findByIdAndUpdate(
+    req.params.id,
+    { status: req.body.status },
+    {
+      runValidators: true, //Luôn chạy validator
+    },
+  );
+  checkExitsOrder(order, next);
+  res.status(204).json({
+    status: 'update successfully',
+  });
+});
+
+exports.getOrderByUser = catchAsync(async (req, res, next) => {
+  const account = await Account.findById(req.params.userId);
+  const customer = await Customer.findOne({
+    account: account._id,
+  });
+
+  console.log(customer);
+  const orders = await Order.find({
+    customer: [customer._id],
+  });
+
+  const orderByStatus = orders.reduce((result, item) => {
+    if (result[item.status]) {
+      result[item.status].push(item);
+    } else {
+      result[item.status] = [item];
+    }
+    return result;
+  }, {});
+
+  res.status(200).json({
+    status: 'success',
+    results: orders.length,
+    orderByStatus,
   });
 });
 
 function checkExitsOrder(voucher, next) {
   if (!voucher) {
     return next(new AppError('No voucher found with that ID', 404));
+  }
+}
+// check if current customer has purchase order (by id) or not
+function checkCurrentCustomerHasOrder(customer, order, next) {
+  if (!customer || !order || customer._id != order.customer._id) {
+    return next(new AppError('No account found with that ID', 404));
+  }
+  if (order.status != 'Processing') {
+    return next(new AppError('Order is status is not processing', 404));
   }
 }
