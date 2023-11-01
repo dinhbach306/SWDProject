@@ -72,12 +72,21 @@ const cageSchema = new mongoose.Schema(
   },
 );
 
-cageSchema.pre(/^find/, function (next, delFlg = true) {
+cageSchema.pre(/^find/, function (next) {
   const filter = {};
-  if (delFlg != null) {
-    filter.delFlg = { $ne: delFlg }
+  const querySetting = this.get('querySetting');
+  console.log(querySetting);
+  // default query not deleted item
+  if (querySetting == null) {
+    filter.delFlg = false;
+  }else if(querySetting == 'deleted'){
+    filter.delFlg = true;
+  }else if (querySetting == "all"){
+
   }
-  this.find();
+  // other means query all item
+  // console.log(filter);
+  this.find(filter);
   next();
 });
 const Cage = mongoose.model('Cage', cageSchema);
