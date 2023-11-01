@@ -3,14 +3,13 @@ const cageController = require('./../controllers/cageController');
 const authController = require('./../controllers/authController');
 const multer = require('multer');
 const router = express.Router();
-const mainImageUpload = multer({ storage: multer.memoryStorage() }).single(
-  'filename',
-);
+
 const upload = multer({ storage: multer.memoryStorage() });
-const arrayImageUpload = multer({ storage: multer.memoryStorage() }).array(
-  'filenames',
-  5,
-);
+
+const customeImageUpload = multer({ storage: multer.memoryStorage() }).fields([
+  { name: 'filename', maxCount: 1 },
+  { name: 'filenames', maxCount: 5 },
+]);
 router
   .route('/')
   .get(cageController.getAllCages)
@@ -19,7 +18,7 @@ router
 router
   .route('/:id')
   .get(cageController.getCage)
-  .patch(mainImageUpload, arrayImageUpload, cageController.updateCage)
+  .patch(customeImageUpload, cageController.updateCage)
   .delete(cageController.deleteCage);
 
 router

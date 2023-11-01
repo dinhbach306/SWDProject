@@ -72,15 +72,15 @@ exports.getCage = catchAsync(async (req, res, next) => {
 });
 
 exports.updateCage = catchAsync(async (req, res, next) => {
-  if (req.file) {
+  if (req.files.length > 0 && req.files.filename) {
     console.log('main');
-    const image = await uploadFile.uploadFile([req.file]);
+    const image = await uploadFile.uploadFile([req.files.filename[0]]);
     req.body.imagePath = image[0];
   }
   const cage = await Cage.findByIdAndUpdate(req.params.id, req.body);
-  if (req.files) {
+  if (req.files.length > 0 && req.files.filenames) {
     console.log('phu');
-    const data = await uploadFile.uploadFile(req.files);
+    const data = await uploadFile.uploadFile(req.files.filenames);
     const image = await Image.findByIdAndUpdate(
       cage.image,
       {
