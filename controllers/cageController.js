@@ -97,18 +97,12 @@ exports.updateCage = catchAsync(async (req, res, next) => {
   });
 });
 exports.updateCageCustom = catchAsync(async (req, res, next) => {
-  
-  
   const cage = await Cage.findById(req.params.cageId);
   checkExistCageWithStatus(cage, 'Pending', next);
-  cage.status = "CUS";
-  cage.price = req.body.price;
-  cage.description = req.body.description;
-cage.save();
-  //save to database 
-
-
-  //
+  
+  handleUpdateCageCustomStatus(cage, req.body, next)
+  
+  
   res.status(200).json({
     status: 'success',
     data: {
@@ -157,7 +151,7 @@ exports.aliasTopCageCheap = (req, res, next) => {
 exports.getAllWithDeletedItem = catchAsync(async (req, res, next) => {
   //Get all cage without userId
   const features = new APIFeatures(
-    Cage.find({ userId: { $exists: false }}).set("querySetting", "all"),
+    Cage.find({ userId: { $exists: false } }).set('querySetting', 'all'),
     req.query,
   );
   const cages = await features.query;
@@ -184,7 +178,7 @@ exports.getCageByName = catchAsync(async (req, res, next) => {
     .paginate();
 
   const cage = await features.query;
-  
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -192,16 +186,39 @@ exports.getCageByName = catchAsync(async (req, res, next) => {
     },
   });
 });
+exports.getAllCagesCustom = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(
+    Cage.find({
+      status: 'CUS',
+    }),
+    req.query,
+  ).filter()
+  .sort()
+  .limitFields()
+  .paginate();
+  const cage = await features.query;
 
+  res.status(200).json({
+    status: 'success',
+    data: {
+      component: cage,
+    },
+  });
+});
 function checkExistCage(cage, next) {
   if (!cage) {
     return next(new AppError('No component found with that ID', 404));
   }
 }
-function checkExistCageWithStatus(cage, status, next){
+function checkExistCageWithStatus(cage, status, next) {
   checkExistCage(cage, next);
-  if(cage.status != status){
-    return next(new AppError('No component found with that ID and status: ' + status, 404));
+  if (cage.status != status) {
+    return next(
+      new AppError(
+        'No component found with that ID and status: ' + status,
+        404,
+      ),
+    );
   }
 }
 
@@ -209,4 +226,23 @@ function checkExistImage(cage, next) {
   if (!cage) {
     return next(new AppError('No image found with that ID', 404));
   }
+}
+function handleUpdateCageCustomStatus(cage, requestBody, next){
+  const status = requestBody.status;
+  switch (status) {
+    case "Reject" :
+    case "CUS":
+      cage.status = status;
+      break;
+    default: 
+      return next(new AppError('Invalid cage status: ' + status, 400));
+  }
+  const newPrice = requestBody.price;
+  const newDescription = requestBody.description;
+  if(!newPrice || !newDescription){
+    return next(new AppError('cage price or description is not specified!!', 400));
+  }
+  cage.price = requestBody.price;
+  cage.description = requestBody.description;
+  cage.save();
 }

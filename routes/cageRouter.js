@@ -29,6 +29,15 @@ router
 router.route('/searchName').post(cageController.getCageByName);
 
 router
+  .route('/customCages')
+  .post(
+    authController.protect,
+    authController.restrictTo('admin', 'staff', 'manager'),
+    cageController.getAllCagesCustom,
+  );
+
+
+router
   .route('/customCages/:cageId')
   .patch(
     authController.protect,
