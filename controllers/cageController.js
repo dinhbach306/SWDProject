@@ -80,6 +80,10 @@ exports.updateCage = catchAsync(async (req, res, next) => {
     req.body.imagePath = image[0];
   }
 
+  if (!req.files.filename) {
+    req.body.imagePath = null;
+  }
+
   const cage = await Cage.findByIdAndUpdate(req.params.id, req.body);
   checkExistCage(cage, next);
 
