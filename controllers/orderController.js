@@ -9,9 +9,7 @@ const Cage = require('./../models/entity/cage');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/mongoUtils');
-const Account = require('./../models/entity/account');
-const Customer = require('./../models/entity/customer');
-const { log } = require('console');
+
 
 exports.createOrder = catchAsync(async (req, res, next) => {
   //update quantity cage
