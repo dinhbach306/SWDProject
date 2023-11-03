@@ -87,7 +87,12 @@ exports.createOrder = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllOrders = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(Order.find(), req.query)
+  const features = new APIFeatures(Order.find().populate({
+    path: "customer",
+    populate: {
+      path: "account",
+    }
+  }), req.query)
     .filter()
     .sort()
     .limitFields()
