@@ -134,8 +134,6 @@ exports.updateOrder = catchAsync(async (req, res, next) => {
 exports.deleteOrder = catchAsync(async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  console.log(decoded);
-  console.log("id", decoded.id)
   const order = await Order.findById(req.params.id);
   console.log(order);
   const account = await Account.findById(decoded.id);
@@ -146,7 +144,6 @@ exports.deleteOrder = catchAsync(async (req, res, next) => {
   })
     .select('-account')
     .exec();
-  console.log(currentUser);
   checkCurrentCustomerHasOrder(currentUser, order, next);
   order.status = "Canceled";
   order.save();
@@ -204,6 +201,22 @@ function checkExitsOrder(voucher, next) {
   if (!voucher) {
     return next(new AppError('No voucher found with that ID', 404));
   }
+}
+async function handleSecuredOrderEndpoint(req, next){
+  const token = req.headers.authorization?.split(' ')[1];
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  const order = await Order.findById(req.params.id);
+  console.log(order);
+  const account = await Account.findById(decoded.id);
+
+  //Not get account
+  const currentUser = await Customer.find({
+    account: account._id,
+  })
+    .select('-account')
+    .exec();
+  checkCurrentCustomerHasOrder(currentUser, order, next);
+  return [order, account];
 }
 // check if current customer has purchase order (by id) or not
 function checkCurrentCustomerHasOrder(customer, order, next) {

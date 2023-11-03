@@ -13,8 +13,9 @@ const imageRouter = require('./routes/imageRouter');
 const customerRouter = require('./routes/customerRouter');
 const cageComponentRouter = require('./routes/cageComponentRouter');
 const orderRouter = require('./routes/orderRouter');
+const orderDetailRouter = require('./routes/orderDetailRouter');
 const AppError = require('./utils/appError');
-
+const OrderDetail = require('./models/entity/orderDetail');
 // 1) MIDDLEWARES
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -50,7 +51,7 @@ app.use('/api/v1/image', imageRouter);
 app.use('/api/v1/customer', customerRouter);
 app.use('/api/v1/cageComponent', cageComponentRouter);
 app.use('/api/v1/order', orderRouter);
-
+app.use('/api/v1/orderDetail', orderDetailRouter);
 // 3) CACTH ALL ROUTES IF THE ROUTE IS NOT DEFINED
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
